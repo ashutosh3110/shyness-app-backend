@@ -131,7 +131,7 @@ const userSchema = new mongoose.Schema({
         type: {
           walletType: {
             type: String,
-            enum: ['phonepe', 'googlepay', 'paytm', 'amazonpay', 'other'],
+            enum: ['phonepe', 'googlepay', 'paytm', 'amazonpay', 'other', ''],
             trim: true,
             default: ''
           },
@@ -167,14 +167,14 @@ const userSchema = new mongoose.Schema({
       // Last Updated
       lastUpdated: {
         type: Date,
-        default: Date.now
+        default: () => new Date()
       }
     },
     default: {
       preferredMethod: 'upi',
       isPaymentInfoComplete: false,
       isVerified: false,
-      lastUpdated: Date.now,
+      lastUpdated: new Date(),
       bankAccount: {},
       upi: {},
       paypal: {},
