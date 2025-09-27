@@ -37,6 +37,24 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const videoRoutes = require('./routes/videos');
+const topicRoutes = require('./routes/topics');
+const scriptRoutes = require('./routes/scripts');
+const paymentRoutes = require('./routes/payments');
+const adminRoutes = require('./routes/admin');
+
+// Use routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/videos', videoRoutes);
+app.use('/api/topics', topicRoutes);
+app.use('/api/scripts', scriptRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
