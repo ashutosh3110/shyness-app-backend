@@ -61,126 +61,124 @@ const userSchema = new mongoose.Schema({
   },
   // Payment Information
   paymentInfo: {
-    // Bank Account Details
-    bankAccount: {
-      accountHolderName: {
-        type: String,
-        trim: true,
-        default: ''
+    type: {
+      // Bank Account Details
+      bankAccount: {
+        type: {
+          accountHolderName: {
+            type: String,
+            trim: true,
+            default: ''
+          },
+          accountNumber: {
+            type: String,
+            trim: true,
+            default: ''
+          },
+          bankName: {
+            type: String,
+            trim: true,
+            default: ''
+          },
+          ifscCode: {
+            type: String,
+            trim: true,
+            default: ''
+          },
+          branchName: {
+            type: String,
+            trim: true,
+            default: ''
+          }
+        },
+        default: {}
       },
-      accountNumber: {
-        type: String,
-        trim: true,
-        default: ''
+      // UPI Details
+      upi: {
+        type: {
+          upiId: {
+            type: String,
+            trim: true,
+            default: ''
+          },
+          upiName: {
+            type: String,
+            trim: true,
+            default: ''
+          }
+        },
+        default: {}
       },
-      bankName: {
-        type: String,
-        trim: true,
-        default: ''
+      // PayPal Details
+      paypal: {
+        type: {
+          paypalEmail: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            default: ''
+          },
+          paypalName: {
+            type: String,
+            trim: true,
+            default: ''
+          }
+        },
+        default: {}
       },
-      ifscCode: {
-        type: String,
-        trim: true,
-        default: ''
+      // Digital Wallet Details
+      wallet: {
+        type: {
+          walletType: {
+            type: String,
+            enum: ['phonepe', 'googlepay', 'paytm', 'amazonpay', 'other'],
+            trim: true,
+            default: ''
+          },
+          walletNumber: {
+            type: String,
+            trim: true,
+            default: ''
+          },
+          walletName: {
+            type: String,
+            trim: true,
+            default: ''
+          }
+        },
+        default: {}
       },
-      branchName: {
+      // Preferred Payment Method
+      preferredMethod: {
         type: String,
-        trim: true,
-        default: ''
+        enum: ['bank_account', 'upi', 'paypal', 'wallet'],
+        default: 'upi'
+      },
+      // Payment Information Status
+      isPaymentInfoComplete: {
+        type: Boolean,
+        default: false
+      },
+      // Verification Status
+      isVerified: {
+        type: Boolean,
+        default: false
+      },
+      // Last Updated
+      lastUpdated: {
+        type: Date,
+        default: Date.now
       }
     },
-    // UPI Details
-    upi: {
-      upiId: {
-        type: String,
-        trim: true,
-        default: ''
-      },
-      upiName: {
-        type: String,
-        trim: true,
-        default: ''
-      }
-    },
-    // PayPal Details
-    paypal: {
-      paypalEmail: {
-        type: String,
-        trim: true,
-        lowercase: true,
-        default: ''
-      },
-      paypalName: {
-        type: String,
-        trim: true,
-        default: ''
-      }
-    },
-    // Digital Wallet Details
-    wallet: {
-      walletType: {
-        type: String,
-        enum: ['phonepe', 'googlepay', 'paytm', 'amazonpay', 'other'],
-        trim: true,
-        default: ''
-      },
-      walletNumber: {
-        type: String,
-        trim: true,
-        default: ''
-      },
-      walletName: {
-        type: String,
-        trim: true,
-        default: ''
-      }
-    },
-    // Preferred Payment Method
-    preferredMethod: {
-      type: String,
-      enum: ['bank_account', 'upi', 'paypal', 'wallet'],
-      default: 'upi'
-    },
-    // Payment Information Status
-    isPaymentInfoComplete: {
-      type: Boolean,
-      default: false
-    },
-    // Verification Status
-    isVerified: {
-      type: Boolean,
-      default: false
-    },
-    // Last Updated
-    lastUpdated: {
-      type: Date,
-      default: Date.now
-    }
-  },
-  default: {
-    preferredMethod: 'upi',
-    isPaymentInfoComplete: false,
-    isVerified: false,
-    lastUpdated: Date.now,
-    bankAccount: {
-      accountHolderName: '',
-      accountNumber: '',
-      bankName: '',
-      ifscCode: '',
-      branchName: ''
-    },
-    upi: {
-      upiId: '',
-      upiName: ''
-    },
-    paypal: {
-      paypalEmail: '',
-      paypalName: ''
-    },
-    wallet: {
-      walletType: '',
-      walletNumber: '',
-      walletName: ''
+    default: {
+      preferredMethod: 'upi',
+      isPaymentInfoComplete: false,
+      isVerified: false,
+      lastUpdated: Date.now,
+      bankAccount: {},
+      upi: {},
+      paypal: {},
+      wallet: {}
     }
   }
 }, {
