@@ -63,7 +63,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shyness-a
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ message: 'Shyness App Backend is running! - Updated for video upload fix' });
+  res.json({ message: 'Shyness App Backend is running! - Force redeploy for video upload CORS fix' });
 });
 
 // Health check
@@ -73,10 +73,10 @@ app.get('/health', (req, res) => {
 
 // Test upload endpoint (public)
 app.post('/test-upload', (req, res) => {
-  console.log('Test upload endpoint hit');
+  console.log('Test upload endpoint hit - Force redeploy');
   res.json({ 
     success: true, 
-    message: 'Test upload endpoint working',
+    message: 'Test upload endpoint working - Force redeploy',
     timestamp: new Date().toISOString(),
     headers: req.headers
   });
