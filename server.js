@@ -52,10 +52,14 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Create temp directory for video processing
+// Create temp directory for video processing (only in development)
 const tempDir = path.join(__dirname, 'temp');
-if (!fs.existsSync(tempDir)) {
-  fs.mkdirSync(tempDir, { recursive: true });
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync(tempDir)) {
+  try {
+    fs.mkdirSync(tempDir, { recursive: true });
+  } catch (error) {
+    console.warn('⚠️ Could not create temp directory:', error.message);
+  }
 }
 
 // Database connection
