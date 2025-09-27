@@ -2,10 +2,10 @@
   "name": "shyness-app-backend",
   "version": "1.0.0",
   "description": "Backend for Shyness App",
-  "main": "server.js",
+  "main": "server-minimal.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node server-minimal.js",
+    "dev": "nodemon server-minimal.js",
     "test": "jest",
     "setup": "node scripts/setup.js",
     "seed": "node scripts/seedData.js",
