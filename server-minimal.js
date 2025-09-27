@@ -71,8 +71,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Test upload endpoint
-app.post('/api/videos/test-upload', (req, res) => {
+// Test upload endpoint (public)
+app.post('/test-upload', (req, res) => {
   console.log('Test upload endpoint hit');
   res.json({ 
     success: true, 
