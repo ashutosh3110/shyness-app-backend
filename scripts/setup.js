@@ -3,8 +3,14 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-// Create necessary directories
+// Create necessary directories (only in development)
 const createDirectories = () => {
+  // Skip directory creation in production (Vercel)
+  if (process.env.NODE_ENV === 'production') {
+    console.log('⚠️ Skipping directory creation in production environment');
+    return;
+  }
+
   const dirs = [
     path.join(__dirname, '../temp'),
     path.join(__dirname, '../uploads'),
@@ -13,8 +19,12 @@ const createDirectories = () => {
 
   dirs.forEach(dir => {
     if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      console.log(`✅ Created directory: ${dir}`);
+      try {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`✅ Created directory: ${dir}`);
+      } catch (error) {
+        console.warn(`⚠️ Could not create directory ${dir}:`, error.message);
+      }
     }
   });
 };
