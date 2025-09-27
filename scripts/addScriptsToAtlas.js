@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 const Script = require('../models/Script');
 const Admin = require('../models/Admin');
-require('dotenv').config({ path: '../config.env' });
+require('dotenv').config();
 
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shyness-app');
-    console.log('✅ Connected to MongoDB');
+    console.log('✅ Connected to MongoDB Atlas');
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
     process.exit(1);
   }
 };
 
-const createScripts = async () => {
+const addScriptsToAtlas = async () => {
   await connectDB();
 
   try {
@@ -353,6 +353,9 @@ Now let's work on today's material:
       console.log(`  ${category}: ${count} scripts`);
     });
 
+    console.log('\n🎉 Scripts added to MongoDB Atlas successfully!');
+    console.log('You can now test them on Vercel deployment.');
+
   } catch (error) {
     console.error('Error creating scripts:', error);
   } finally {
@@ -361,4 +364,4 @@ Now let's work on today's material:
   }
 };
 
-createScripts();
+addScriptsToAtlas();
