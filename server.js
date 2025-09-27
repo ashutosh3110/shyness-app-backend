@@ -9,6 +9,11 @@ const fs = require('fs');
 // Load environment variables
 require('dotenv').config();
 
+// Set NODE_ENV to production if not set (for Vercel)
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+}
+
 // Import routes
 const authRoutes = require('./routes/auth');
 const topicRoutes = require('./routes/topics');

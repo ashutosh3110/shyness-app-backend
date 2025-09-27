@@ -11,7 +11,7 @@
     "seed": "node scripts/seedData.js",
     "create-user": "node scripts/createTestUser.js",
     "create-admin": "node scripts/createAdmin.js",
-    "vercel-build": "echo 'Build completed'"
+    "vercel-build": "echo 'Build completed' && echo 'NODE_ENV=production'"
   },
   "dependencies": {
     "axios": "^1.12.2",
