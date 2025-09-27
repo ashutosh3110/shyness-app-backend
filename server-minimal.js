@@ -63,7 +63,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shyness-a
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ message: 'Shyness App Backend is running!' });
+  res.json({ message: 'Shyness App Backend is running! - Updated for video upload fix' });
 });
 
 // Health check
