@@ -17,8 +17,14 @@ app.use(cors({
   origin: ['http://localhost:3000', 'https://shyness-app-frontend-eg8n.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
@@ -26,11 +32,22 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   console.log('Headers:', req.headers);
+  console.log('Origin:', req.headers.origin);
+  console.log('User-Agent:', req.headers['user-agent']);
+  
   if (req.method === 'POST' && req.url.includes('upload')) {
     console.log('Upload request received');
     console.log('Content-Type:', req.headers['content-type']);
     console.log('Content-Length:', req.headers['content-length']);
+    console.log('Authorization:', req.headers.authorization ? 'Present' : 'Missing');
   }
+  
+  if (req.method === 'OPTIONS') {
+    console.log('Preflight request received');
+    console.log('Access-Control-Request-Method:', req.headers['access-control-request-method']);
+    console.log('Access-Control-Request-Headers:', req.headers['access-control-request-headers']);
+  }
+  
   next();
 });
 
