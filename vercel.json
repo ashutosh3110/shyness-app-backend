@@ -18,7 +18,8 @@
   },
   "functions": {
     "server-minimal.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 1024
     }
   }
 }
