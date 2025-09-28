@@ -15,11 +15,5 @@
   "env": {
     "NODE_ENV": "production",
     "PORT": "5000"
-  },
-  "functions": {
-    "server-simple.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
   }
 }
