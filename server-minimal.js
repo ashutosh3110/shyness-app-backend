@@ -44,8 +44,29 @@ app.use((req, res, next) => {
   
   next();
 });
+// Increase body parser limits for video uploads
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+
+// Add specific handling for video uploads
+app.use('/api/videos/upload', (req, res, next) => {
+  console.log('Video upload request received');
+  console.log('Content-Type:', req.headers['content-type']);
+  console.log('Content-Length:', req.headers['content-length']);
+  console.log('User-Agent:', req.headers['user-agent']);
+  
+  // Check file size before processing
+  const contentLength = parseInt(req.headers['content-length']);
+  if (contentLength && contentLength > 4.5 * 1024 * 1024) { // 4.5MB limit
+    console.log('File too large for Vercel:', contentLength, 'bytes');
+    return res.status(413).json({
+      success: false,
+      message: 'File too large. Please use a file smaller than 4.5MB or use direct upload to Cloudinary.'
+    });
+  }
+  
+  next();
+});
 
 // Add request logging for debugging
 app.use((req, res, next) => {
