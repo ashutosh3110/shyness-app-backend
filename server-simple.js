@@ -249,50 +249,53 @@ app.get('/api/scripts/category/:categoryId', (req, res) => {
   // Handle undefined categoryId by returning all scripts
   if (categoryId === 'undefined' || !categoryId) {
     console.log('Undefined categoryId, returning all scripts');
+    const allScripts = [
+      {
+        _id: '1',
+        title: 'Introduction Speech',
+        description: 'Practice introducing yourself confidently',
+        duration: '2-3 minutes',
+        difficulty: 'Beginner',
+        category: 'Public Speaking'
+      },
+      {
+        _id: '2',
+        title: 'Thank You Speech',
+        description: 'Practice giving thank you speeches',
+        duration: '1-2 minutes',
+        difficulty: 'Beginner',
+        category: 'Public Speaking'
+      },
+      {
+        _id: '3',
+        title: 'Tell Me About Yourself',
+        description: 'Common interview question practice',
+        duration: '2-3 minutes',
+        difficulty: 'Intermediate',
+        category: 'Job Interview'
+      },
+      {
+        _id: '4',
+        title: 'Starting Conversations',
+        description: 'Practice starting conversations with strangers',
+        duration: '1-2 minutes',
+        difficulty: 'Beginner',
+        category: 'Social Skills'
+      },
+      {
+        _id: '5',
+        title: 'Project Presentation',
+        description: 'Practice presenting project updates',
+        duration: '5-7 minutes',
+        difficulty: 'Advanced',
+        category: 'Presentation'
+      }
+    ];
+    
+    console.log('Returning all scripts:', allScripts.length, 'scripts');
     return res.json({
       success: true,
-      data: [
-        {
-          _id: '1',
-          title: 'Introduction Speech',
-          description: 'Practice introducing yourself confidently',
-          duration: '2-3 minutes',
-          difficulty: 'Beginner',
-          category: 'Public Speaking'
-        },
-        {
-          _id: '2',
-          title: 'Thank You Speech',
-          description: 'Practice giving thank you speeches',
-          duration: '1-2 minutes',
-          difficulty: 'Beginner',
-          category: 'Public Speaking'
-        },
-        {
-          _id: '3',
-          title: 'Tell Me About Yourself',
-          description: 'Common interview question practice',
-          duration: '2-3 minutes',
-          difficulty: 'Intermediate',
-          category: 'Job Interview'
-        },
-        {
-          _id: '4',
-          title: 'Starting Conversations',
-          description: 'Practice starting conversations with strangers',
-          duration: '1-2 minutes',
-          difficulty: 'Beginner',
-          category: 'Social Skills'
-        },
-        {
-          _id: '5',
-          title: 'Project Presentation',
-          description: 'Practice presenting project updates',
-          duration: '5-7 minutes',
-          difficulty: 'Advanced',
-          category: 'Presentation'
-        }
-      ]
+      data: allScripts
     });
   }
   
@@ -385,6 +388,32 @@ app.get('/api/scripts/search', (req, res) => {
         _id: '1',
         title: 'Introduction Speech',
         description: 'Practice introducing yourself confidently',
+        category: 'Public Speaking'
+      }
+    ]
+  });
+});
+
+// Catch-all for any script requests
+app.get('/api/scripts/*', (req, res) => {
+  console.log('Catch-all script endpoint hit:', req.url);
+  res.json({
+    success: true,
+    data: [
+      {
+        _id: '1',
+        title: 'Introduction Speech',
+        description: 'Practice introducing yourself confidently',
+        duration: '2-3 minutes',
+        difficulty: 'Beginner',
+        category: 'Public Speaking'
+      },
+      {
+        _id: '2',
+        title: 'Thank You Speech',
+        description: 'Practice giving thank you speeches',
+        duration: '1-2 minutes',
+        difficulty: 'Beginner',
         category: 'Public Speaking'
       }
     ]
