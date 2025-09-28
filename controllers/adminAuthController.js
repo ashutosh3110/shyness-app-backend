@@ -6,10 +6,18 @@ const asyncHandler = require('../middleware/asyncHandler');
 // @route   POST /api/admin/auth/login
 // @access  Public
 exports.adminLogin = asyncHandler(async (req, res) => {
+  console.log('=== ADMIN LOGIN REQUEST ===');
+  console.log('Email:', req.body.email);
+  console.log('Password provided:', !!req.body.password);
+  
   const { email, password } = req.body;
 
   // Check if admin exists
   const admin = await Admin.findOne({ email, isActive: true });
+  console.log('Admin found:', admin ? 'Yes' : 'No');
+  console.log('Admin email:', admin?.email);
+  console.log('Admin role:', admin?.role);
+  console.log('Admin isActive:', admin?.isActive);
   
   if (!admin) {
     return res.status(401).json({
@@ -20,13 +28,17 @@ exports.adminLogin = asyncHandler(async (req, res) => {
 
   // Check password
   const isPasswordMatch = await admin.matchPassword(password);
+  console.log('Password match:', isPasswordMatch);
   
   if (!isPasswordMatch) {
+    console.log('❌ Password mismatch');
     return res.status(401).json({
       success: false,
       message: 'Invalid admin credentials'
     });
   }
+  
+  console.log('✅ Admin login successful');
 
   // Update last login
   admin.lastLogin = new Date();
