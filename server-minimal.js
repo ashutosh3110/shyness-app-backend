@@ -135,6 +135,46 @@ app.post('/test-upload', (req, res) => {
   });
 });
 
+// Debug database data endpoint
+app.get('/debug-database', async (req, res) => {
+  try {
+    console.log('=== DEBUG DATABASE ===');
+    
+    const User = require('./models/User');
+    const Video = require('./models/Video');
+    const Topic = require('./models/Topic');
+    
+    const userCount = await User.countDocuments();
+    const videoCount = await Video.countDocuments();
+    const topicCount = await Topic.countDocuments();
+    
+    console.log('User count:', userCount);
+    console.log('Video count:', videoCount);
+    console.log('Topic count:', topicCount);
+    
+    const recentUsers = await User.find().limit(3).select('name email createdAt');
+    const recentVideos = await Video.find().limit(3).select('title uploadDate user');
+    
+    res.json({
+      success: true,
+      data: {
+        userCount,
+        videoCount,
+        topicCount,
+        recentUsers,
+        recentVideos
+      }
+    });
+  } catch (error) {
+    console.error('Debug database error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Debug error',
+      error: error.message
+    });
+  }
+});
+
 // Debug admin password endpoint
 app.post('/debug-admin-password', async (req, res) => {
   try {
