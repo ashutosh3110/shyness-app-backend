@@ -71,7 +71,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shyness-a
 // Basic route
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'Shyness App Backend is running! - MAJOR REDEPLOY FOR SIGNUP CORS FIX',
+    message: 'Shyness App Backend is running! - SIGNUP CORS FIX DEPLOYED',
     timestamp: new Date().toISOString(),
     version: '2.0.0-signup-fix'
   });
