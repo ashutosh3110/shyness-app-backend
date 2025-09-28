@@ -203,6 +203,144 @@ app.get('/api/users/rewards', (req, res) => {
   });
 });
 
+// Script categories endpoint
+app.get('/api/scripts/categories', (req, res) => {
+  console.log('Script categories endpoint hit');
+  res.json({
+    success: true,
+    data: [
+      {
+        _id: '1',
+        name: 'Public Speaking',
+        description: 'Scripts for public speaking practice',
+        icon: '🎤',
+        scriptCount: 5
+      },
+      {
+        _id: '2',
+        name: 'Job Interview',
+        description: 'Scripts for job interview preparation',
+        icon: '💼',
+        scriptCount: 3
+      },
+      {
+        _id: '3',
+        name: 'Social Skills',
+        description: 'Scripts for social interaction practice',
+        icon: '👥',
+        scriptCount: 4
+      },
+      {
+        _id: '4',
+        name: 'Presentation',
+        description: 'Scripts for presentation skills',
+        icon: '📊',
+        scriptCount: 6
+      }
+    ]
+  });
+});
+
+// Scripts by category endpoint
+app.get('/api/scripts/category/:categoryId', (req, res) => {
+  console.log('Scripts by category endpoint hit:', req.params.categoryId);
+  const categoryId = req.params.categoryId;
+  
+  const scripts = {
+    '1': [
+      {
+        _id: '1',
+        title: 'Introduction Speech',
+        description: 'Practice introducing yourself confidently',
+        duration: '2-3 minutes',
+        difficulty: 'Beginner',
+        category: 'Public Speaking'
+      },
+      {
+        _id: '2',
+        title: 'Thank You Speech',
+        description: 'Practice giving thank you speeches',
+        duration: '1-2 minutes',
+        difficulty: 'Beginner',
+        category: 'Public Speaking'
+      }
+    ],
+    '2': [
+      {
+        _id: '3',
+        title: 'Tell Me About Yourself',
+        description: 'Common interview question practice',
+        duration: '2-3 minutes',
+        difficulty: 'Intermediate',
+        category: 'Job Interview'
+      }
+    ],
+    '3': [
+      {
+        _id: '4',
+        title: 'Starting Conversations',
+        description: 'Practice starting conversations with strangers',
+        duration: '1-2 minutes',
+        difficulty: 'Beginner',
+        category: 'Social Skills'
+      }
+    ],
+    '4': [
+      {
+        _id: '5',
+        title: 'Project Presentation',
+        description: 'Practice presenting project updates',
+        duration: '5-7 minutes',
+        difficulty: 'Advanced',
+        category: 'Presentation'
+      }
+    ]
+  };
+  
+  res.json({
+    success: true,
+    data: scripts[categoryId] || []
+  });
+});
+
+// Individual script endpoint
+app.get('/api/scripts/:scriptId', (req, res) => {
+  console.log('Individual script endpoint hit:', req.params.scriptId);
+  res.json({
+    success: true,
+    data: {
+      _id: req.params.scriptId,
+      title: 'Sample Script',
+      content: 'This is a sample script content for practice.',
+      description: 'Practice script for speaking skills',
+      duration: '2-3 minutes',
+      difficulty: 'Beginner',
+      category: 'Public Speaking',
+      tips: [
+        'Speak clearly and slowly',
+        'Maintain eye contact',
+        'Use gestures naturally'
+      ]
+    }
+  });
+});
+
+// Search scripts endpoint
+app.get('/api/scripts/search', (req, res) => {
+  console.log('Search scripts endpoint hit:', req.query);
+  res.json({
+    success: true,
+    data: [
+      {
+        _id: '1',
+        title: 'Introduction Speech',
+        description: 'Practice introducing yourself confidently',
+        category: 'Public Speaking'
+      }
+    ]
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
