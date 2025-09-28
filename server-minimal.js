@@ -135,6 +135,65 @@ app.post('/test-upload', (req, res) => {
   });
 });
 
+// Debug admin password endpoint
+app.post('/debug-admin-password', async (req, res) => {
+  try {
+    console.log('=== DEBUG ADMIN PASSWORD ===');
+    const { email, password } = req.body;
+    console.log('Email:', email);
+    console.log('Password provided:', !!password);
+    
+    const Admin = require('./models/Admin');
+    const admin = await Admin.findOne({ email, isActive: true });
+    console.log('Admin found:', admin ? 'Yes' : 'No');
+    
+    if (admin) {
+      console.log('Admin email:', admin.email);
+      console.log('Admin role:', admin.role);
+      console.log('Admin isActive:', admin.isActive);
+      console.log('Admin password hash length:', admin.password?.length);
+      
+      // Test password comparison
+      const bcrypt = require('bcryptjs');
+      const isPasswordMatch = await bcrypt.compare(password, admin.password);
+      console.log('Direct bcrypt compare result:', isPasswordMatch);
+      
+      // Test with the model method
+      const modelMatch = await admin.matchPassword(password);
+      console.log('Model matchPassword result:', modelMatch);
+      
+      res.json({
+        success: true,
+        debug: {
+          adminFound: !!admin,
+          email: admin?.email,
+          role: admin?.role,
+          isActive: admin?.isActive,
+          passwordHashLength: admin?.password?.length,
+          directBcryptMatch: isPasswordMatch,
+          modelMatchPassword: modelMatch
+        }
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Admin not found',
+        debug: {
+          adminFound: false,
+          email: email
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Debug admin password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Debug error',
+      error: error.message
+    });
+  }
+});
+
 // Simple video upload test endpoint
 app.post('/api/videos/test-upload', (req, res) => {
   console.log('=== VIDEO UPLOAD TEST ENDPOINT ===');
