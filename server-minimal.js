@@ -50,21 +50,30 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Add specific handling for video uploads
 app.use('/api/videos/upload', (req, res, next) => {
-  console.log('Video upload request received');
+  console.log('=== VIDEO UPLOAD REQUEST ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
   console.log('Content-Type:', req.headers['content-type']);
   console.log('Content-Length:', req.headers['content-length']);
   console.log('User-Agent:', req.headers['user-agent']);
+  console.log('Origin:', req.headers.origin);
   
   // Check file size before processing
   const contentLength = parseInt(req.headers['content-length']);
+  console.log('Content length parsed:', contentLength);
+  
   if (contentLength && contentLength > 4.5 * 1024 * 1024) { // 4.5MB limit
-    console.log('File too large for Vercel:', contentLength, 'bytes');
+    console.log('❌ File too large for Vercel:', contentLength, 'bytes (', (contentLength / 1024 / 1024).toFixed(2), 'MB)');
     return res.status(413).json({
       success: false,
-      message: 'File too large. Please use a file smaller than 4.5MB or use direct upload to Cloudinary.'
+      message: `File too large (${(contentLength / 1024 / 1024).toFixed(2)}MB). Vercel limit is 4.5MB. Please compress your video or use Cloudinary direct upload.`,
+      fileSize: contentLength,
+      fileSizeMB: (contentLength / 1024 / 1024).toFixed(2),
+      limit: '4.5MB'
     });
   }
   
+  console.log('✅ File size OK, proceeding...');
   next();
 });
 
@@ -123,6 +132,23 @@ app.post('/test-upload', (req, res) => {
     message: 'Test upload endpoint working - Force redeploy',
     timestamp: new Date().toISOString(),
     headers: req.headers
+  });
+});
+
+// Simple video upload test endpoint
+app.post('/api/videos/test-upload', (req, res) => {
+  console.log('=== VIDEO UPLOAD TEST ENDPOINT ===');
+  console.log('Headers:', req.headers);
+  console.log('Content-Type:', req.headers['content-type']);
+  console.log('Content-Length:', req.headers['content-length']);
+  console.log('Body keys:', Object.keys(req.body || {}));
+  
+  res.json({
+    success: true,
+    message: 'Video upload test endpoint working',
+    receivedHeaders: req.headers,
+    bodySize: req.headers['content-length'],
+    timestamp: new Date().toISOString()
   });
 });
 
