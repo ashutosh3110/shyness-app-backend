@@ -4,24 +4,9 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-// CORS configuration
+// CORS configuration - More permissive for debugging
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://shyness-app-frontend-eg8n.vercel.app'
-    ];
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins for now
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
@@ -30,13 +15,27 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Handle preflight requests
-app.options('*', (req, res) => {
+// Manual CORS handling for all requests
+app.use((req, res, next) => {
+  console.log('=== REQUEST ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  console.log('Origin:', req.headers.origin);
+  console.log('Headers:', req.headers);
+  
+  // Set CORS headers for all requests
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.status(200).end();
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    console.log('Preflight request handled');
+    return res.status(200).end();
+  }
+  
+  next();
 });
 
 app.use(express.json({ limit: '100mb' }));
