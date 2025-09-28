@@ -87,7 +87,13 @@ exports.getRewards = async (req, res) => {
 // @access  Private
 exports.getDashboard = async (req, res) => {
   try {
+    console.log('=== DASHBOARD REQUEST ===');
+    console.log('User ID:', req.user.id);
+    
     const user = await User.findById(req.user.id).populate('rewards');
+    console.log('User found:', user ? 'Yes' : 'No');
+    console.log('User totalVideos:', user?.totalVideos);
+    console.log('User currentStreak:', user?.currentStreak);
     
     // Get recent videos
     const recentVideos = await Video.find({ user: req.user.id })
@@ -108,6 +114,9 @@ exports.getDashboard = async (req, res) => {
         }
       }
     ]);
+    
+    console.log('Video stats from database:', videoStats);
+    console.log('Recent videos count:', recentVideos.length);
 
     // Get monthly uploads for chart
     const monthlyUploads = await Video.aggregate([
