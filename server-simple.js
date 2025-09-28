@@ -6,7 +6,22 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://shyness-app-frontend-eg8n.vercel.app'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://shyness-app-frontend-eg8n.vercel.app'
+    ];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
@@ -53,7 +68,13 @@ app.post('/test-signup', (req, res) => {
 
 // Simple signup endpoint
 app.post('/api/auth/signup', (req, res) => {
-  console.log('Signup endpoint hit:', req.body);
+  console.log('=== SIGNUP REQUEST ===');
+  console.log('Headers:', req.headers);
+  console.log('Origin:', req.headers.origin);
+  console.log('Body:', req.body);
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  
   res.json({
     success: true,
     message: 'User registered successfully',
