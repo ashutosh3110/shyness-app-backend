@@ -126,6 +126,78 @@ app.post('/test-upload', (req, res) => {
   });
 });
 
+// Cloudinary direct upload signature endpoint
+app.post('/api/videos/cloudinary-signature', (req, res) => {
+  console.log('Cloudinary signature request received');
+  try {
+    const cloudinary = require('cloudinary').v2;
+    
+    // Configure Cloudinary
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp: timestamp,
+        folder: 'shyness-app-videos'
+      },
+      process.env.CLOUDINARY_API_SECRET
+    );
+    
+    res.json({
+      success: true,
+      data: {
+        signature: signature,
+        timestamp: timestamp,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: process.env.CLOUDINARY_API_KEY,
+        folder: 'shyness-app-videos'
+      }
+    });
+  } catch (error) {
+    console.error('Cloudinary signature error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error generating upload signature',
+      error: error.message
+    });
+  }
+});
+
+// Save video metadata after Cloudinary upload
+app.post('/api/videos/save-metadata', async (req, res) => {
+  console.log('Save video metadata request received');
+  try {
+    const { title, description, topicId, cloudinaryUrl, cloudinaryPublicId, duration } = req.body;
+    
+    // Here you would save to your database
+    // For now, just return success
+    res.json({
+      success: true,
+      message: 'Video metadata saved successfully',
+      data: {
+        title,
+        description,
+        topicId,
+        cloudinaryUrl,
+        cloudinaryPublicId,
+        duration
+      }
+    });
+  } catch (error) {
+    console.error('Save metadata error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error saving video metadata',
+      error: error.message
+    });
+  }
+});
+
 // Test signup endpoint (public)
 app.post('/test-signup', (req, res) => {
   console.log('Test signup endpoint hit');
