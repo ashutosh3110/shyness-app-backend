@@ -111,6 +111,98 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
+// Dashboard endpoint
+app.get('/api/users/dashboard', (req, res) => {
+  console.log('Dashboard endpoint hit');
+  res.json({
+    success: true,
+    data: {
+      user: {
+        id: 'test-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        role: 'user',
+        currentStreak: 5,
+        totalVideos: 3,
+        paymentInfo: {
+          preferredMethod: 'upi',
+          isPaymentInfoComplete: false,
+          isVerified: false
+        }
+      },
+      stats: {
+        totalVideos: 3,
+        currentStreak: 5,
+        longestStreak: 10,
+        totalMinutes: 45
+      }
+    }
+  });
+});
+
+// User profile endpoint
+app.get('/api/auth/me', (req, res) => {
+  console.log('Get me endpoint hit');
+  res.json({
+    success: true,
+    data: {
+      user: {
+        id: 'test-user-id',
+        name: 'Test User',
+        email: 'test@example.com',
+        role: 'user',
+        currentStreak: 5,
+        totalVideos: 3,
+        paymentInfo: {
+          preferredMethod: 'upi',
+          isPaymentInfoComplete: false,
+          isVerified: false
+        }
+      }
+    }
+  });
+});
+
+// User stats endpoint
+app.get('/api/users/stats', (req, res) => {
+  console.log('Stats endpoint hit');
+  res.json({
+    success: true,
+    data: {
+      totalVideos: 3,
+      currentStreak: 5,
+      longestStreak: 10,
+      totalMinutes: 45
+    }
+  });
+});
+
+// User streak endpoint
+app.get('/api/users/streak', (req, res) => {
+  console.log('Streak endpoint hit');
+  res.json({
+    success: true,
+    data: {
+      currentStreak: 5,
+      longestStreak: 10
+    }
+  });
+});
+
+// User rewards endpoint
+app.get('/api/users/rewards', (req, res) => {
+  console.log('Rewards endpoint hit');
+  res.json({
+    success: true,
+    data: {
+      rewards: [
+        { id: 1, name: 'First Video', earned: true },
+        { id: 2, name: 'Week Streak', earned: false }
+      ]
+    }
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
