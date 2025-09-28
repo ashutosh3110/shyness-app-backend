@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "server-minimal.js",
+      "src": "server-simple.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/server-minimal.js"
+      "dest": "/server-simple.js"
     }
   ],
   "env": {
@@ -17,7 +17,7 @@
     "PORT": "5000"
   },
   "functions": {
-    "server-minimal.js": {
+    "server-simple.js": {
       "maxDuration": 60,
       "memory": 1024
     }
