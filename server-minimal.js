@@ -23,8 +23,15 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Handle preflight requests
-app.options('*', cors());
+// Handle preflight requests specifically
+app.options('*', (req, res) => {
+  console.log('Preflight request for:', req.url);
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
@@ -82,6 +89,17 @@ app.post('/test-upload', (req, res) => {
   });
 });
 
+// Test signup endpoint (public)
+app.post('/test-signup', (req, res) => {
+  console.log('Test signup endpoint hit');
+  res.json({ 
+    success: true, 
+    message: 'Test signup endpoint working',
+    timestamp: new Date().toISOString(),
+    headers: req.headers
+  });
+});
+
 // Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -91,8 +109,11 @@ const scriptRoutes = require('./routes/scripts');
 const paymentRoutes = require('./routes/payments');
 const adminRoutes = require('./routes/admin');
 
-// Use routes
-app.use('/api/auth', authRoutes);
+// Use routes with debugging
+app.use('/api/auth', (req, res, next) => {
+  console.log('Auth route hit:', req.method, req.url);
+  next();
+}, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/topics', topicRoutes);
