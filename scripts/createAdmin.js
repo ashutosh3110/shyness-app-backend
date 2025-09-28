@@ -27,12 +27,21 @@ const createAdmin = async () => {
       console.log('Admin already exists.');
       console.log('Email:', admin.email);
       console.log('Role:', admin.role);
+      console.log('IsActive:', admin.isActive);
+      
+      // Update isActive to true if it's false
+      if (!admin.isActive) {
+        admin.isActive = true;
+        await admin.save();
+        console.log('✅ Updated admin isActive to true');
+      }
     } else {
       admin = await Admin.create({
         name: 'Super Admin',
         email: adminEmail,
         password: adminPassword,
         role: 'super-admin',
+        isActive: true,
         permissions: {
           canManageUsers: true,
           canManageVideos: true,

@@ -1,54 +1,58 @@
-const http = require('http');
+const mongoose = require('mongoose');
+const Admin = require('./models/Admin');
+require('dotenv').config();
 
-function testAdminLogin() {
-  const postData = JSON.stringify({
-    email: 'admin@shynessapp.com',
-    password: 'admin123456'
-  });
+const connectDB = async () => {
+  try {
+    const mongoUri = 'mongodb+srv://ashutoshbankey21306_db_user:w2YNILqab5xL3mje@cluster0.puchwaz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+    await mongoose.connect(mongoUri);
+    console.log('✅ Connected to MongoDB Atlas');
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
 
-  const options = {
-    hostname: 'localhost',
-    port: 5000,
-    path: '/api/admin/auth/login',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(postData)
-    }
-  };
+const testAdminLogin = async () => {
+  await connectDB();
 
-  const req = http.request(options, (res) => {
-    let data = '';
+  try {
+    const adminEmail = 'admin@shynessapp.com';
+    const adminPassword = 'admin123456';
+
+    console.log('🔍 Testing admin login...');
+    console.log('Email:', adminEmail);
+    console.log('Password:', adminPassword);
+
+    // Find admin
+    const admin = await Admin.findOne({ email: adminEmail, isActive: true });
+    console.log('Admin found:', admin ? 'Yes' : 'No');
     
-    res.on('data', (chunk) => {
-      data += chunk;
-    });
-    
-    res.on('end', () => {
-      try {
-        const response = JSON.parse(data);
-        if (res.statusCode === 200) {
-          console.log('✅ Admin login successful!');
-          console.log('Admin role:', response.data.admin.role);
-          console.log('Token:', response.data.token);
-        } else {
-          console.log('❌ Admin login failed:', response.message);
-          console.log('Status Code:', res.statusCode);
-        }
-      } catch (error) {
-        console.log('❌ Error parsing response:', error.message);
-        console.log('Raw response:', data);
+    if (admin) {
+      console.log('Admin details:');
+      console.log('- Email:', admin.email);
+      console.log('- Role:', admin.role);
+      console.log('- IsActive:', admin.isActive);
+      console.log('- Has password:', !!admin.password);
+      
+      // Test password
+      const isPasswordMatch = await admin.matchPassword(adminPassword);
+      console.log('Password match:', isPasswordMatch);
+      
+      if (isPasswordMatch) {
+        console.log('✅ Admin login test PASSED');
+      } else {
+        console.log('❌ Admin login test FAILED - Password mismatch');
       }
-    });
-  });
-
-  req.on('error', (error) => {
-    console.log('❌ Request error:', error.message);
-  });
-
-  req.write(postData);
-  req.end();
-}
+    } else {
+      console.log('❌ Admin not found');
+    }
+  } catch (error) {
+    console.error('❌ Test error:', error);
+  } finally {
+    mongoose.connection.close();
+    console.log('🔌 Database connection closed');
+  }
+};
 
 testAdminLogin();
-
