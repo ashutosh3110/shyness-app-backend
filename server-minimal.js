@@ -198,6 +198,34 @@ app.post('/api/videos/save-metadata', async (req, res) => {
   }
 });
 
+// Alternative upload endpoint for large files - returns Cloudinary upload URL
+app.post('/api/videos/upload-large', (req, res) => {
+  console.log('Large file upload request received');
+  try {
+    const { title, description, topicId } = req.body;
+    
+    // Return Cloudinary upload URL and parameters
+    res.json({
+      success: true,
+      message: 'Use Cloudinary direct upload for large files',
+      data: {
+        uploadUrl: `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/video/upload`,
+        uploadPreset: 'shyness-app-videos',
+        folder: 'shyness-app-videos',
+        maxFileSize: '100MB',
+        instructions: 'Upload directly to Cloudinary, then call /api/videos/save-metadata with the result'
+      }
+    });
+  } catch (error) {
+    console.error('Large upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error processing large file upload',
+      error: error.message
+    });
+  }
+});
+
 // Test signup endpoint (public)
 app.post('/test-signup', (req, res) => {
   console.log('Test signup endpoint hit');
