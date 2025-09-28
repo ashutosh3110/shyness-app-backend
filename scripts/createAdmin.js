@@ -4,8 +4,10 @@ require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shyness-app');
-    console.log('✅ Connected to MongoDB');
+    // Use the Atlas connection string
+    const mongoUri = 'mongodb+srv://ashutoshbankey21306_db_user:w2YNILqab5xL3mje@cluster0.puchwaz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+    await mongoose.connect(mongoUri);
+    console.log('✅ Connected to MongoDB Atlas');
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
     process.exit(1);
