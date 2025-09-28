@@ -4,6 +4,37 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://ashutoshbankey21306_db_user:w2YNILqab5xL3mje@cluster0.puchwaz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(MONGODB_URI)
+.then(() => {
+  console.log('✅ MongoDB connected successfully');
+})
+.catch((error) => {
+  console.error('❌ MongoDB connection error:', error);
+});
+
+// Script Schema
+const scriptSchema = new mongoose.Schema({
+  title: String,
+  category: String,
+  topic: String,
+  description: String,
+  content: String,
+  duration: Number,
+  difficulty: String,
+  tags: [String],
+  isActive: Boolean,
+  downloadCount: Number,
+  createdBy: mongoose.Schema.Types.ObjectId,
+  lastModified: Date,
+  createdAt: Date,
+  updatedAt: Date
+});
+
+const Script = mongoose.model('Script', scriptSchema);
+
 // CORS configuration - More permissive for debugging
 app.use(cors({
   origin: true, // Allow all origins for now
@@ -204,178 +235,130 @@ app.get('/api/users/rewards', (req, res) => {
 });
 
 // Script categories endpoint
-app.get('/api/scripts/categories', (req, res) => {
+app.get('/api/scripts/categories', async (req, res) => {
   console.log('Script categories endpoint hit');
-  res.json({
-    success: true,
-    data: [
-      {
-        _id: '1',
-        name: 'Public Speaking',
-        description: 'Scripts for public speaking practice',
-        icon: '🎤',
-        scriptCount: 5
-      },
-      {
-        _id: '2',
-        name: 'Job Interview',
-        description: 'Scripts for job interview preparation',
-        icon: '💼',
-        scriptCount: 3
-      },
-      {
-        _id: '3',
-        name: 'Social Skills',
-        description: 'Scripts for social interaction practice',
-        icon: '👥',
-        scriptCount: 4
-      },
-      {
-        _id: '4',
-        name: 'Presentation',
-        description: 'Scripts for presentation skills',
-        icon: '📊',
-        scriptCount: 6
-      }
-    ]
-  });
+  try {
+    // Get unique categories from MongoDB
+    const categories = await Script.aggregate([
+      { $match: { isActive: true } },
+      { $group: { 
+        _id: '$category', 
+        count: { $sum: 1 },
+        name: { $first: '$category' }
+      }},
+      { $sort: { name: 1 } }
+    ]);
+    
+    // Map categories to frontend format
+    const categoryMap = {
+      'professional': { name: 'Professional', icon: '💼', description: 'Professional development scripts' },
+      'personal': { name: 'Personal Growth', icon: '🌱', description: 'Personal development scripts' },
+      'educational': { name: 'Educational', icon: '📚', description: 'Educational and learning scripts' },
+      'social': { name: 'Social Skills', icon: '👥', description: 'Social interaction scripts' },
+      'creative': { name: 'Creative', icon: '🎨', description: 'Creative expression scripts' },
+      'motivational': { name: 'Motivational', icon: '💪', description: 'Motivational and inspirational scripts' }
+    };
+    
+    const formattedCategories = categories.map(cat => ({
+      _id: cat._id,
+      name: categoryMap[cat._id]?.name || cat._id,
+      description: categoryMap[cat._id]?.description || `Scripts for ${cat._id}`,
+      icon: categoryMap[cat._id]?.icon || '📝',
+      scriptCount: cat.count
+    }));
+    
+    console.log('Returning categories:', formattedCategories.length);
+    res.json({
+      success: true,
+      data: formattedCategories
+    });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.json({
+      success: false,
+      message: 'Error fetching categories',
+      data: []
+    });
+  }
 });
 
 // Scripts by category endpoint
-app.get('/api/scripts/category/:categoryId', (req, res) => {
+app.get('/api/scripts/category/:categoryId', async (req, res) => {
   console.log('Scripts by category endpoint hit:', req.params.categoryId);
   const categoryId = req.params.categoryId;
   
-  // Handle undefined categoryId by returning all scripts
-  if (categoryId === 'undefined' || !categoryId) {
-    console.log('Undefined categoryId, returning all scripts');
-    const allScripts = [
-      {
-        _id: '1',
-        title: 'Introduction Speech',
-        description: 'Practice introducing yourself confidently',
-        duration: '2-3 minutes',
-        difficulty: 'Beginner',
-        category: 'Public Speaking'
-      },
-      {
-        _id: '2',
-        title: 'Thank You Speech',
-        description: 'Practice giving thank you speeches',
-        duration: '1-2 minutes',
-        difficulty: 'Beginner',
-        category: 'Public Speaking'
-      },
-      {
-        _id: '3',
-        title: 'Tell Me About Yourself',
-        description: 'Common interview question practice',
-        duration: '2-3 minutes',
-        difficulty: 'Intermediate',
-        category: 'Job Interview'
-      },
-      {
-        _id: '4',
-        title: 'Starting Conversations',
-        description: 'Practice starting conversations with strangers',
-        duration: '1-2 minutes',
-        difficulty: 'Beginner',
-        category: 'Social Skills'
-      },
-      {
-        _id: '5',
-        title: 'Project Presentation',
-        description: 'Practice presenting project updates',
-        duration: '5-7 minutes',
-        difficulty: 'Advanced',
-        category: 'Presentation'
-      }
-    ];
+  try {
+    let scripts;
     
-    console.log('Returning all scripts:', allScripts.length, 'scripts');
-    return res.json({
+    // Handle undefined categoryId by returning all scripts
+    if (categoryId === 'undefined' || !categoryId) {
+      console.log('Undefined categoryId, returning all scripts from MongoDB');
+      scripts = await Script.find({ isActive: true }).select('title description duration difficulty category topic').limit(20);
+    } else {
+      console.log('Fetching scripts for category:', categoryId);
+      scripts = await Script.find({ category: categoryId, isActive: true }).select('title description duration difficulty category topic').limit(20);
+    }
+    
+    // Format scripts for frontend
+    const formattedScripts = scripts.map(script => ({
+      _id: script._id.toString(),
+      title: script.title,
+      description: script.description,
+      duration: `${script.duration} minutes`,
+      difficulty: script.difficulty,
+      category: script.category,
+      topic: script.topic
+    }));
+    
+    console.log('Returning scripts:', formattedScripts.length, 'scripts');
+    res.json({
       success: true,
-      data: allScripts
+      data: formattedScripts
     });
-  }
-  
-  const scripts = {
-    '1': [
-      {
-        _id: '1',
-        title: 'Introduction Speech',
-        description: 'Practice introducing yourself confidently',
-        duration: '2-3 minutes',
-        difficulty: 'Beginner',
-        category: 'Public Speaking'
-      },
-      {
-        _id: '2',
-        title: 'Thank You Speech',
-        description: 'Practice giving thank you speeches',
-        duration: '1-2 minutes',
-        difficulty: 'Beginner',
-        category: 'Public Speaking'
-      }
-    ],
-    '2': [
-      {
-        _id: '3',
-        title: 'Tell Me About Yourself',
-        description: 'Common interview question practice',
-        duration: '2-3 minutes',
-        difficulty: 'Intermediate',
-        category: 'Job Interview'
-      }
-    ],
-    '3': [
-      {
-        _id: '4',
-        title: 'Starting Conversations',
-        description: 'Practice starting conversations with strangers',
-        duration: '1-2 minutes',
-        difficulty: 'Beginner',
-        category: 'Social Skills'
-      }
-    ],
-    '4': [
-      {
-        _id: '5',
-        title: 'Project Presentation',
-        description: 'Practice presenting project updates',
-        duration: '5-7 minutes',
-        difficulty: 'Advanced',
-        category: 'Presentation'
-      }
-    ]
-  };
-  
-  res.json({
-    success: true,
-    data: scripts[categoryId] || []
-  });
+  } catch (error) {
+    console.error('Error fetching scripts:', error);
+    res.json({
+      success: false,
+      message: 'Error fetching scripts',
+      data: []
+    });
 });
 
 // Individual script endpoint
-app.get('/api/scripts/:scriptId', (req, res) => {
+app.get('/api/scripts/:scriptId', async (req, res) => {
   console.log('Individual script endpoint hit:', req.params.scriptId);
-  res.json({
-    success: true,
-    data: {
-      _id: req.params.scriptId,
-      title: 'Sample Script',
-      content: 'This is a sample script content for practice.',
-      description: 'Practice script for speaking skills',
-      duration: '2-3 minutes',
-      difficulty: 'Beginner',
-      category: 'Public Speaking',
-      tips: [
-        'Speak clearly and slowly',
-        'Maintain eye contact',
-        'Use gestures naturally'
-      ]
+  try {
+    const script = await Script.findById(req.params.scriptId);
+    if (!script) {
+      return res.json({
+        success: false,
+        message: 'Script not found',
+        data: null
+      });
     }
-  });
+    
+    res.json({
+      success: true,
+      data: {
+        _id: script._id.toString(),
+        title: script.title,
+        content: script.content,
+        description: script.description,
+        duration: `${script.duration} minutes`,
+        difficulty: script.difficulty,
+        category: script.category,
+        topic: script.topic,
+        tags: script.tags
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching script:', error);
+    res.json({
+      success: false,
+      message: 'Error fetching script',
+      data: null
+    });
+  }
 });
 
 // Search scripts endpoint
