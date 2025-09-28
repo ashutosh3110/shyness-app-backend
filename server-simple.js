@@ -322,6 +322,7 @@ app.get('/api/scripts/category/:categoryId', async (req, res) => {
       message: 'Error fetching scripts',
       data: []
     });
+  }
 });
 
 // Individual script endpoint
